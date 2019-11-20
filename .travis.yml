@@ -3,6 +3,6 @@ os:
     - linux
     - osx
 before_install:
-  - brew install coreutils &>/dev/null|| true
+  - brew install coreutils || true
 script:
     - ./tests/tests.sh
