@@ -7,6 +7,13 @@
 # https://github.com/qzb/is.sh
 #
 
+which gstat &>/dev/null
+if [ $? -eq 0 ]; then
+	stat()
+	{
+		$(which gstat) $*
+	}
+fi
 is() {
     if [ "$1" == "--help" ]; then
         cat << EOF
