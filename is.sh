@@ -6,14 +6,17 @@
 # For most current version checkout repository:
 # https://github.com/qzb/is.sh
 #
-
+stat()
+{
+	$(which stat) $*
+}
 which gstat &>/dev/null
-if [ $? -eq 0 ]; then
-	stat()
+[ $? -eq 0 ] && \
+stat()
 	{
 		$(which gstat) $*
 	}
-fi
+
 is() {
     if [ "$1" == "--help" ]; then
         cat << EOF
