@@ -212,14 +212,17 @@ assert_true "$is --help"
 
 # unknown condition
 assert_false "$is spam foo bar"
-assert_true "$is user  $(whoami)"
-assert_true  "$is fowner $(whoami)"
-assert_true  "$is fgroup $(whoami)"
-assert_true  "$is fmountpoint file $current_mp"
-assert_true  "$is fempty file"
-assert_true  "$is fsize file 0"
-assert_true  "$is fsizelt file 1024"
-assert_true  "$is forights file 777"
 
+assert_true "$is user  $(whoami)"
+
+if [ "$(uname)" = "Linux" ]; then
+	assert_true  "$is fowner file"
+	assert_true  "$is fgroup file"
+	assert_true  "$is fmountpoint file $current_mp"
+	assert_true  "$is fempty file"
+	assert_true  "$is fsize file 0"
+	assert_true  "$is fsizelt file 1024"
+	assert_true  "$is forights file 777"
+fi
 # end of tests
 assert_end
