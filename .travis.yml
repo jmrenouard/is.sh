@@ -2,5 +2,7 @@ language: bash
 os:
     - linux
     - osx
+before_install:
+  - brew install coreutils &>/dev/null|| true
 script:
     - ./tests/tests.sh
