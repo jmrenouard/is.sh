@@ -216,8 +216,8 @@ assert_false "$is spam foo bar"
 assert_true "$is user  $(whoami)"
 
 if [ "$(uname)" = "Linux" ]; then
-	assert_true  "$is fowner file"
-	assert_true  "$is fgroup file"
+	assert_true  "$is fowner file $(whoami)"
+	assert_true  "$is fgroup file $(whoami)"
 	assert_true  "$is fmountpoint file $current_mp"
 	assert_true  "$is fempty file"
 	assert_true  "$is fsize file 0"
