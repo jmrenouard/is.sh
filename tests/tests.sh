@@ -30,7 +30,7 @@ touch new_file
 mkdir dir
 ln -s file symlink_file
 ln -s dir symlink_dir
-
+current_mp=$(stat -c %m .)
 
 #
 # Helpers
@@ -212,6 +212,14 @@ assert_true "$is --help"
 
 # unknown condition
 assert_false "$is spam foo bar"
+assert_true "$is user  $(whoami)"
+assert_true  "$is fowner $(whoami)"
+assert_true  "$is fgroup $(whoami)"
+assert_true  "$is fmountpoint file $current_mp"
+assert_true  "$is fempty file"
+assert_true  "$is fsize file 0"
+assert_true  "$is fsizelt file 1024"
+assert_true  "$is forights file 777"
 
 # end of tests
 assert_end

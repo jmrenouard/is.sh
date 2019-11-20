@@ -59,6 +59,16 @@ $ source ./is.sh
 * ``is writeable $path`` - checks if file is writeable
 * ``is executable $path`` - checks if file is executable
 * ``is available $command`` - checks if given command is available
+* ``is fowner $path $user`` - checks if file owner is equal to second parameter
+* ``is fgroup $path $group`` - checks if file group is equal to second parameter
+* ``is fmountpoint $path $mountpoint`` - checks if file mountpoint is equal to second parameter
+* ``is fempty $path`` - checks if file is empty
+* ``is fsize $path $sizeBytes`` - checks if file size is equals to to second parameter(in bytes)
+* ``is fsizelt $path $sizeBytes`` - checks if file size is lower than second parameter(in bytes)
+* ``is fsizegt $path $sizeBytes`` - checks if file size is greater than second parameter(in bytes)
+* ``is forights $path $sizeBytes`` - checks if file octal rights are equal to second parameter(in octal)
+* ``is fuser $user`` - checks if current user is equal to second parameter
+* ``is tcp_port $port_number`` - checks if second parameter port number is listening on host (requires netstat)
 * ``is older $pathA $pathB`` - checks if first file is older than second one
 * ``is newer $pathA $pathB`` - checks if first file is newer than second one
 * ``is true $value`` - true if value is equal "true" or "0"

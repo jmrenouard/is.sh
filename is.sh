@@ -32,6 +32,16 @@ Conditions:
   is newer PATH_A PATH_B
   is true VALUE
   is false VALUE
+  is fowner PATH USER
+  is fgroup  PATH GROUP
+  is fmountpoint PATH MOUNTPOINT
+  is fempty PATH
+  is fsize PATH BYTE_SIZE
+  is fsizelt PATH$path BYTE_SIZE
+  is fsizegt PATH$path BYTE_SIZE
+  is forights PATH OCTALRIGHTS
+  is fuser USER
+  is tcp_port PORTNUMBER
 
 Negation:
   is not equal VALUE_A VALUE_B
@@ -82,6 +92,26 @@ EOF
             [ -x "$value_a" ]; return $?;;
         available|installed)
             which "$value_a"; return $?;;
+        tcp_port_open|tcp_port|tport)
+            netstat -ltn | grep -E ":${value_a}\s" | grep -q 'LISTEN'; return $?;;
+        fowner|fuser)
+            [ "$(stat -c %U $value_a)" = "$value_b" ]; return $?;;
+        fgroup)
+            [ "$(stat -c %G $value_a)" = "$value_b" ]; return $?;;
+        fmountpoint)
+            [ "$(stat -c %m $value_a)" = "$value_b" ]; return $?;;
+        fempty)
+            [ "$(stat -c %s $value_a)" = "0" ]; return $?;;
+        fsize)
+            [ $(stat -c %s $value_a) -eq $value_b ]; return $?;;
+        fsizelt)
+            [ $(stat -c %s $value_a) -lt $value_b ]; return $?;;
+        fsizegt)
+            [ $(stat -c %s $value_a) -gt $value_b ]; return $?;;
+        forights)
+            [ "$(stat -c %a $value_a)" = "$value_b" ]; return $?;;
+        user)
+            is eq $(whoami) $value_a; return $?;;
         empty)
             [ -z "$value_a" ]; return $?;;
         number)
