@@ -3,6 +3,6 @@ os:
     - linux
     - osx
 before_install:
-  - brew install coreutils || true
+  - brew install gnu-stat || true
 script:
     - ./tests/tests.sh
