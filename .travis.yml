@@ -3,6 +3,8 @@ os:
     - linux
     - osx
 before_install:
-  - brew install gnu-stat || true
+  - brew install coreutils || true
+  - which stat
+  - which gstat
 script:
     - ./tests/tests.sh
