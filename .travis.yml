@@ -2,9 +2,5 @@ language: bash
 os:
     - linux
     - osx
-before_install:
-  - brew install coreutils || true
-  - which stat || true
-  - which gstat ||true
 script:
     - ./tests/tests.sh
