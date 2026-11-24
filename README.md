@@ -1,104 +1,93 @@
 # is.sh
 
-Fancy alternative for old good test command.
+Fancy, human-readable alternative to the standard shell `test` / `[` command for Bash (`v1.1.2` fork of `qzb/is.sh`).
 
-[![NPM Version][npm-image]][npm-url]
-[![Build][travis-image]][travis-url]
+> **Documentation Portal:** [docs/index.md](docs/index.md) ([Tutorials](docs/01-tutorials/index.md), [How-To Guides](docs/02-how-to-guides/index.md), [Reference](docs/03-reference/index.md), [Explanation](docs/04-explanation/index.md))
+
+## Condition Dispatch Architecture
+
+```mermaid
+flowchart TD
+    IN["is [not] [a|an|the] <condition> [args]"] --> HELP{"--help or --version?"}
+    HELP -->|Yes| INFO["Print usage/version and exit"]
+    HELP -->|No| NEG{"condition == not?"}
+    NEG -->|Yes| REC1["Recurse and negate (! is ...)"]
+    NEG -->|No| ART{"a | an | the?"}
+    ART -->|Yes| REC2["Strip article and recurse"]
+    ART -->|No| CASE["case condition: file | stat | numeric | string | bool"]
+    CASE --> OUT["Return exit code 0 (true) or 1 (false)"]
+```
 
 ## Example
 
 ```sh
+source ./is.sh
 var=123
 
-if is equal $var 123.0; then
+if is equal "$var" 123.0; then
     echo "it just works"
 fi
 
-if is not a substring $var "foobar"; then
+if is not a substring "foobar" "$var"; then
     echo "and it's easy to read"
 fi
 ```
 
 ## Installation
 
-In order to use is.sh you can install it with one of following 1-liners:
+Source `./is.sh` directly inside your Bash script (exports `is` automatically when sourced) or invoke `./is.sh` as a standalone CLI command:
 
 ```sh
-# Unix-like
-$ sudo sh -c 'cd /usr/local/bin && wget raw.githubusercontent.com/qzb/is.sh/latest/is.sh -O is && chmod +x is'
+# Source into current Bash shell
+source ./is.sh
 
-# NPM
-$ npm install -g is.sh
+# Or invoke directly
+chmod +x ./is.sh
+./is.sh equal 42 42.0
 ```
 
-If you don't want to install is.sh system-wide you can just download it and source it from your script:
+You can also install from the fork or npm:
 
 ```sh
-$ wget raw.githubusercontent.com/qzb/is.sh/latest/is.sh
-$ source ./is.sh
+sudo curl -fsSL https://raw.githubusercontent.com/jmrenouard/is.sh/master/is.sh -o /usr/local/bin/is && sudo chmod +x /usr/local/bin/is
 ```
 
-## Usage
+## Usage Summary
 
 ### Conditions
 
-* ``is equal $valueA $valueB`` - checks if values are the same or if they are equal numbers
-* ``is matching $regexp $value`` - checks if whole value matches to regular expression
-* ``is substring $valueA $valueB`` - checks if first value is a part of second one
-* ``is empty $value`` - checks if value is empty
-* ``is number $value`` - checks if value is a number
-* ``is gt $numberA $numberB`` - true if first number is greater than second one
-* ``is lt $numberA $numberB`` - true if first number is less than second one
-* ``is ge $numberA $numberB`` - true if first number is greater than or equal to second one
-* ``is le $numberA $numberB`` - true if first number is less than or equal to second one
-* ``is file $path`` - checks if it is a file
-* ``is dir $path`` - checks if it is a directory
-* ``is link $path`` - checks if it is a symbolic link
-* ``is existent $path`` - checks if there is a file or directory or anything else with this path
-* ``is readable $path`` - checks if file is readable
-* ``is writeable $path`` - checks if file is writeable
-* ``is executable $path`` - checks if file is executable
-* ``is available $command`` - checks if given command is available
-* ``is fowner $path $user`` - checks if file owner is equal to second parameter
-* ``is fgroup $path $group`` - checks if file group is equal to second parameter
-* ``is fmountpoint $path $mountpoint`` - checks if file mountpoint is equal to second parameter
-* ``is fempty $path`` - checks if file is empty
-* ``is fsize $path $sizeBytes`` - checks if file size is equals to to second parameter(in bytes)
-* ``is fsizelt $path $sizeBytes`` - checks if file size is lower than second parameter(in bytes)
-* ``is fsizegt $path $sizeBytes`` - checks if file size is greater than second parameter(in bytes)
-* ``is forights $path $sizeBytes`` - checks if file octal rights are equal to second parameter(in octal)
-* ``is fuser $user`` - checks if current user is equal to second parameter
-* ``is tcp_port $port_number`` - checks if second parameter port number is listening on host (requires netstat)
-* ``is older $pathA $pathB`` - checks if first file is older than second one
-* ``is newer $pathA $pathB`` - checks if first file is newer than second one
-* ``is true $value`` - true if value is equal "true" or "0"
-* ``is false $value`` - opposite of ``is true $value``
+* `is equal $valueA $valueB` (alias: `eq`) — checks whether strings are identical or numerically equal (`awk`).
+* `is matching $regexp $value` (alias: `match`) — checks full-line extended regex (`grep -xE`) match against `$value`.
+* `is substring $needle $haystack` (alias: `substr`) — checks fixed-string containment (`grep -F`).
+* `is empty $value` — true when string length is zero.
+* `is number $value` — true for unsigned integer or decimal numbers (`^[0-9]+(\.[0-9]+)?$`).
+* `is gt|lt|ge|le $numberA $numberB` — numeric comparisons via `awk`.
+* `is file|dir|link|existent|readable|writeable|executable $path` — POSIX file tests (aliases: `directory`, `symlink`, `existing`, `exist`, `exists`).
+* `is available $command` (alias: `installed`) — checks whether `$command` exists in `PATH`.
+* `is fowner|fgroup|fmountpoint|fempty|fsize|fsizelt|fsizegt|forights $path ...` — GNU Linux `stat -c` checks (alias `fuser` maps to `fowner`).
+* `is user $username` — checks whether `$(whoami)` equals `$username`.
+* `is tcp_port $port` (aliases: `tport`, `tcp_port_open`) — checks listening TCP ports via `netstat -ltn`.
+* `is older|newer $pathA $pathB` — file modification-time comparisons.
+* `is true|false $value` — evaluates `true` (`"true"` or `"0"`) vs `false`.
 
-### Negations
+### Negations and Optional Articles
 
-You can negate any condition by putting *not* in front of it.
+Put `not` and/or optional articles (`a`, `an`, `the`) before any condition:
 
 ```sh
-$ is number "abc" && echo "number"
-$ is not number "abc" && echo "not a number"
-not a number
+is not a number "abc" && echo "not a number"
+is an existing ./README.md && echo "found"
 ```
 
-### Articles
+## Verification
 
-You can add *a*, *an*, and *the* articles before condition name.
+Run the Bash predicate test suite and Python Diátaxis/documentation suite in Linux / WSL:
 
 ```sh
-$ is a number 5
-$ is not a substring abc defghi
+bash tests/tests.sh
+python3 -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 ## License
 
-MIT
-
-
-[npm-image]: https://img.shields.io/npm/v/is.sh.svg
-[npm-url]: https://npmjs.org/package/is.sh
-[travis-image]: https://img.shields.io/travis/qzb/is.sh/master.svg
-[travis-url]: https://travis-ci.org/qzb/is.sh
+MIT ([`LICENSE`](LICENSE))

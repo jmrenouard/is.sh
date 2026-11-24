@@ -159,7 +159,7 @@ assert_true  "$is equal abc abc"
 # is matching
 assert_true  "$is matching '[a-c]+' 'abc'"
 assert_false "$is matching '[a-c]+' 'Abc'"
-assert_false "$is matching '[a-c]+' 'abd"
+assert_false "$is matching '[a-c]+' 'abd'"
 
 # is substring
 assert_true  "$is substring cde abcdef"
